@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "CommonJS",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist/src",
+    "sourceMap": true,
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["chrome"]
+  },
+  "include": ["./src/**/*.ts"]
+}
