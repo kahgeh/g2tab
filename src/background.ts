@@ -5,6 +5,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const matchingTabs = [];
 
       for (const window of windows) {
+        if (!window || !window.tabs) {
+          continue;
+        }
         for (const tab of window.tabs) {
           if (tab.url && tab.url.toLowerCase().includes(query)) {
             matchingTabs.push(tab);
