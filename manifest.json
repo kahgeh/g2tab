@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "go2tab",
+  "version": "1.0",
+  "description": "Manage tabs and get to them quickly",
+  "permissions": ["tabs", "windows"],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "48": "images/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "icons": {
+    "48": "images/icon48.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
