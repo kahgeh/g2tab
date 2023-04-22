@@ -1,5 +1,3 @@
-// src/popup.ts
-
 const searchInput = document.getElementById("search-input") as HTMLInputElement;
 const resultsList = document.getElementById("results-list") as HTMLUListElement;
 
