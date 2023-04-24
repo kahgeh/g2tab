@@ -25,7 +25,8 @@ This extension is not published in chrome webstore, so if you want to use it, cl
 # Local Development
 
 ## Build
-Run ./build.sh
+
+`npm run build` 
 
 ## Try it out locally in chrome
 

@@ -1,25 +1,4 @@
-//@ts-ignore
-interface TabEntry {
-  name: string;
-  searchText: string;
-  key: string;
-  url: string;
-}
-
-let mappings: TabEntry[];
-
-//@ts-ignore
-async function loadMappings(): Promise<TabEntry[]> {
-  try {
-    const url = chrome.runtime.getURL("config/mappings.json");
-    const response = await fetch(url);
-    mappings = await response.json();
-  } catch (e) {
-    console.error("cannot load mappings file", e);
-  }
-}
-
-loadMappings();
+import { mappings } from "./mappings";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if (request.type === "SEARCH_TABS") {

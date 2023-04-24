@@ -1,19 +1,6 @@
-//@ts-ignore
-interface TabEntry {
-  name: string;
-  searchText: string;
-  key: string;
-  url: string;
-}
-//@ts-ignore
-async function fetchMappings(): Promise<TabEntry[]> {
-  const url = chrome.runtime.getURL("config/mappings.json");
-  const response = await fetch(url);
-  return response.json();
-}
+import { mappings } from "./mappings";
 
 async function renderMappings() {
-  const mappings = await fetchMappings();
   const list = document.getElementById("mapping-list") as HTMLUListElement;
 
   for (const entry of mappings) {
