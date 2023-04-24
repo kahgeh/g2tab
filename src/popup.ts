@@ -4,9 +4,19 @@ async function renderMappings() {
   const list = document.getElementById("mapping-list") as HTMLUListElement;
 
   for (const entry of mappings) {
-    const listItem = document.createElement("li");
-    listItem.textContent = `${entry.key}: ${entry.name}`;
-    list.appendChild(listItem);
+    const item = document.createElement("div");
+    item.className = "mapping-item";
+
+    const key = document.createElement("span");
+    key.className = "key";
+    key.textContent = entry.key;
+    item.appendChild(key);
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = entry.name;
+    item.appendChild(name)
+    list.appendChild(item);
   }
 }
 

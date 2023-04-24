@@ -1,29 +1,47 @@
 /* styles/popup.css */
 
 body {
-  font-family: Arial, sans-serif;
   margin: 15px;
-  width: 300px;
+  font-family: Arial, sans-serif;
+  background-color: #050505;
 }
 
-input {
-  display: block;
-  width: 100%;
-  padding: 6px 12px;
-  box-sizing: border-box;
-  margin-bottom: 10px;
+h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #C3EEFA;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
+.mappings {
+  width: 50em;
+  display: flex;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding: 20px;
+  flex-direction: row;
+  justify-content: space-evenly;
+  border-radius: 1em;
+  border: 1px solid grey;
+  flex-wrap: wrap;
 }
 
-li {
-  margin-bottom: 5px;
+.mapping-item {
+  align-items: start;
+  margin-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  flex-basis: 25%;
 }
 
-a {
-  color: #3a6ef5;
-  text-decoration: none;
+.key {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #C3EEFA;
+  padding-right: 8px;
+}
+
+.name {
+  font-size: 1.2em;
+  color: #F2F2F2;
 }
