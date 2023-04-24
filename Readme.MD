@@ -19,7 +19,7 @@ Instead of mindlessly tabbing or searching to get to your commonly used web site
 
 # Status
 
-This extension is not published in chrome webstore, so if you want to use it, clone this repo, update the config/mappings.json file to reflect you commonly used websites and follow the `local development` steps below.
+This extension is not published in chrome webstore, so if you want to use it, clone this repo, create config/my-mappings.json file(see sample-mappings.json) to reflect you commonly used websites and follow the `local development` steps below.
 
 
 # Local Development
