@@ -9,7 +9,7 @@ body {
 h1 {
   font-size: 1.5em;
   font-weight: bold;
-  color: #C3EEFA;
+  color: #c3eefa;
 }
 
 .mappings {
@@ -19,29 +19,27 @@ h1 {
   margin-bottom: 20px;
   padding: 20px;
   flex-direction: row;
-  justify-content: space-evenly;
   border-radius: 1em;
   border: 1px solid grey;
   flex-wrap: wrap;
 }
 
 .mapping-item {
-  align-items: start;
-  margin-left: 10px;
+  margin-left: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
-  flex-basis: 25%;
+  flex-basis: 20%;
 }
 
 .key {
   font-style: italic;
   font-weight: bold;
   font-size: 1.5em;
-  color: #C3EEFA;
+  color: #c3eefa;
   padding-right: 8px;
 }
 
 .name {
   font-size: 1.2em;
-  color: #F2F2F2;
+  color: #f2f2f2;
 }
