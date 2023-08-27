@@ -15,7 +15,7 @@ async function renderMappings() {
     const name = document.createElement("span");
     name.className = "name";
     name.textContent = entry.name;
-    item.appendChild(name)
+    item.appendChild(name);
     list.appendChild(item);
   }
 }
