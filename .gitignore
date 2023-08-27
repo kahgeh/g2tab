@@ -4,3 +4,5 @@ dist
 .DS_Store
 config/mappings.json
 config/my-mappings.json
+config/personal-mappings.json
+config/work-mappings.json
