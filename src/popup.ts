@@ -18,6 +18,7 @@ async function renderMappings() {
     item.appendChild(name);
     list.appendChild(item);
   }
+  return list;
 }
 
 renderMappings();
@@ -36,6 +37,7 @@ document.body.addEventListener("keydown", (event) => {
       } else {
         chrome.tabs.create({ url: entry.url });
       }
+      window.close();
     }
   );
 });
