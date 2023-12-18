@@ -12,6 +12,15 @@ h1 {
   color: #c3eefa;
 }
 
+hr {
+  width: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
 .mappings {
   width: 50em;
   display: flex;
@@ -37,9 +46,35 @@ h1 {
   font-size: 1.5em;
   color: #c3eefa;
   padding-right: 8px;
+  width: 1em;
 }
 
 .name {
   font-size: 1.2em;
   color: #f2f2f2;
+}
+
+.keymap-entry {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  flex-grow: 1;
+  column-gap: 1px;
+}
+
+.settings {
+  padding: 5px;
+  flex-direction: column;
+}
+
+.keymap-entry > .name {
+  flex: 1;
+}
+
+.keymap-entry > .search-text {
+  flex: 3;
+}
+
+.keymap-entry > .url {
+  flex: 3;
 }

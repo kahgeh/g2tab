@@ -1,8 +1,35 @@
 import { MapEntry, defaultKeymaps } from "./mappings";
 
+const leftKeys = [
+  "q",
+  "w",
+  "e",
+  "r",
+  "t",
+  "a",
+  "s",
+  "d",
+  "f",
+  "g",
+  "z",
+  "x",
+  "c",
+  "v",
+];
+const rightKeys = ["y", "u", "i", "o", "p", "h", "j", "k", "l", "b", "n", "m"];
+const keyOrderBasedOnKeyboardLayout = [...leftKeys, ...rightKeys];
+const sortedDefaultKeymaps: MapEntry[] = [];
+for (let i = 0; i < keyOrderBasedOnKeyboardLayout.length; i++) {
+  const keymap = defaultKeymaps.find(
+    (e) => e.key === keyOrderBasedOnKeyboardLayout[i]
+  );
+  sortedDefaultKeymaps.push(keymap!);
+}
+
 const settingNames = {
   keymaps: "keymaps",
 };
+
 var app_settings: { [keymaps: string]: MapEntry[] } = {
   keymaps: [],
 };
@@ -58,6 +85,7 @@ async function renderEditSection() {
   const keymaps = app_settings[settingNames.keymaps];
   const form = document.getElementById("edit-keymaps") as HTMLDivElement;
   form.replaceChildren();
+
   for (const entry of keymaps) {
     const setting = document.createElement("div");
     setting.className = "keymap-entry";
@@ -69,6 +97,7 @@ async function renderEditSection() {
 
     const name = document.createElement("input");
     name.type = "text";
+    name.placeholder = "Name";
     name.className = "name";
     name.id = "name";
     name.name = "name";
@@ -76,7 +105,8 @@ async function renderEditSection() {
     setting.appendChild(name);
 
     const searchText = document.createElement("input");
-    searchText.className = "searchText";
+    searchText.className = "search-text";
+    searchText.placeholder = "Search text";
     searchText.type = "text";
     searchText.id = "searchText";
     searchText.name = "searchText";
@@ -85,6 +115,7 @@ async function renderEditSection() {
 
     const url = document.createElement("input");
     url.className = "url";
+    url.placeholder = "URL";
     url.type = "text";
     url.id = "url";
     url.name = "url";
@@ -103,7 +134,9 @@ function saveKeymaps() {
     const setting = settings[i] as HTMLDivElement;
     const key = setting.querySelector(".key") as HTMLLabelElement;
     const name = setting.querySelector(".name") as HTMLInputElement;
-    const searchText = setting.querySelector(".searchText") as HTMLInputElement;
+    const searchText = setting.querySelector(
+      ".search-text"
+    ) as HTMLInputElement;
     const url = setting.querySelector(".url") as HTMLInputElement;
     const entry = keymaps.find((e) => e.key === key.textContent);
     if (entry) {
@@ -123,7 +156,7 @@ async function loadMappings() {
   var settings = await chrome.storage.sync.get([settingNames.keymaps]);
   if (settings) {
     app_settings[settingNames.keymaps] =
-      (settings[settingNames.keymaps] as MapEntry[]) ?? defaultKeymaps;
+      (settings[settingNames.keymaps] as MapEntry[]) ?? sortedDefaultKeymaps;
   }
 
   console.log("render mappings...");
@@ -153,7 +186,7 @@ async function loadExtension() {
     if (toggleEditBtn!.value.indexOf("Edit") >= 0) {
       renderEditSection();
       toggleEditBtn!.value = "Hide";
-      settingsDiv.style.display = "block";
+      settingsDiv.style.display = "flex";
       disableKeymaps("editing keymaps");
       return;
     }
