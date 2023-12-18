@@ -1,4 +1,4 @@
-import savedMappings from "../config/mappings.json";
+import emptyMappings from "../config/empty-mappings.json";
 
 export interface MapEntry {
   name: string;
@@ -7,4 +7,4 @@ export interface MapEntry {
   url: string;
 }
 
-export const mappings: MapEntry[] = savedMappings;
+export const defaultKeymaps: MapEntry[] = emptyMappings;

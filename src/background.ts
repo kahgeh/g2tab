@@ -1,8 +1,10 @@
-import { mappings } from "./mappings";
+import { SearchTabRequest } from "./contracts";
 
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+  console.log(JSON.stringify(request));
+  const { key, mappings } = request as SearchTabRequest;
   if (request.type === "SEARCH_TABS") {
-    const entry = mappings.find((e) => e.key === request.key);
+    const entry = mappings.find((e) => e.key === key);
 
     if (!entry) {
       sendResponse(null);

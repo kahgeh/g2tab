@@ -4,8 +4,8 @@
   "description": "",
   "scripts": {
     "pickMap": "node pick_mappings_file.js",
-    "build": "npm run pickMap && parcel build manifest.json",
-    "start": "npm run pickMap && parcel watch manifest.json --host localhost -p 3010"
+    "build": "parcel build manifest.json",
+    "start": "parcel watch manifest.json --host localhost -p 3010"
   },
   "keywords": [],
   "author": "",

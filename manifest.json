@@ -3,7 +3,7 @@
   "name": "go2tab",
   "version": "1.0",
   "description": "Manage tabs and get to them quickly",
-  "permissions": ["tabs", "windows"],
+  "permissions": ["tabs", "windows", "storage"],
   "action": {
     "default_popup": "src/popup.html",
     "default_icon": {

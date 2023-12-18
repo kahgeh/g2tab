@@ -2,15 +2,23 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../styles/popup.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../styles/popup.css" />
   <title>Tab Search</title>
 </head>
 
 <body>
   <h1>G/open tabs</h1>
-  <div id="mapping-list" class="mappings"/>
-  <script src="popup.ts" type="module" />
+  <div id="mapping-list" class="mappings"></div>
+  <script src="popup.ts" type="module"></script>
+  <input id="toggle-edit-btn" type="button" value="Edit keymaps" />
+  <div id="settings">
+    <div>
+      <input id="save-btn" type="button" value="Save" />
+    </div>
+    <form id="edit-keymaps"></form>
+  </div>
 </body>
+
 </html>
