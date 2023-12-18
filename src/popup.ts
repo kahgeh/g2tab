@@ -1,4 +1,6 @@
 import { MapEntry, defaultKeymaps } from "./mappings";
+import { REQ_SEARCH_TABS, REQ_PREVIOUS_TAB, REQ_LOG } from "./contracts";
+const nameof = <T>(name: keyof T) => name;
 const leftKeys = [
   "q",
   "w",
@@ -27,47 +29,31 @@ function sortBasedOnKeyboard(keymaps: MapEntry[], layout: string[]) {
   return sortedKeymaps;
 }
 
-const settingNames = {
-  keymaps: "keymaps",
-};
+interface AppSettings {
+  keymaps: MapEntry[];
+}
 
-var app_settings: { [keymaps: string]: MapEntry[] } = {
+var app_settings: AppSettings = {
   keymaps: [],
 };
 
-const keyDownBehavior = (event: KeyboardEvent) => {
-  chrome.runtime.sendMessage(
-    { type: "SEARCH_TABS", key: event.key, mappings: app_settings.keymaps },
-    (response) => {
-      if (!response) return;
-
-      const { entry, matchingTabs } = response;
-
-      if (matchingTabs.length > 0) {
-        const tab = matchingTabs[0];
-        console.log(`found tab ${tab.id} for key ${event.key}`);
-        chrome.tabs.update(tab.id, { active: true }, () => {
-          if (chrome.runtime.lastError) {
-            console.log(
-              `error activating tab reason : ${chrome.runtime.lastError.message}`
-            );
-            return;
-          }
-          chrome.windows.update(tab.windowId, { focused: true }, () => {
-            if (chrome.runtime.lastError) {
-              console.log(
-                `error activating window reason : ${chrome.runtime.lastError.message}`
-              );
-              return;
-            }
-          });
-        });
-      } else {
-        chrome.tabs.create({ url: entry.url });
-      }
-      window.close();
+const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
+  console.log(`key down "${event.key}"`);
+  let queryOptions = { active: true, lastFocusedWindow: true };
+  // `tab` will either be a `tabs.Tab` instance or `undefined`.
+  chrome.tabs.query(queryOptions).then(([activeTab]) => {
+    if (event.key === " ") {
+      chrome.runtime.sendMessage({ type: REQ_PREVIOUS_TAB, activeTab });
+      return;
     }
-  );
+
+    chrome.runtime.sendMessage({
+      type: REQ_SEARCH_TABS,
+      key: event.key,
+      mappings: app_settings.keymaps,
+      activeTab,
+    });
+  });
 };
 
 const settingsDiv = document.getElementById("settings") as HTMLDivElement;
@@ -76,7 +62,7 @@ const toggleEditBtn = document.getElementById(
 ) as HTMLButtonElement;
 
 async function renderMappings() {
-  const keymaps = app_settings[settingNames.keymaps];
+  const keymaps = app_settings.keymaps;
   const list = document.getElementById("mapping-list") as HTMLUListElement;
   list.replaceChildren();
   var sortedKeymaps = sortBasedOnKeyboard(keymaps, qwertyLayout);
@@ -99,7 +85,7 @@ async function renderMappings() {
 }
 
 async function renderEditSection() {
-  const keymaps = app_settings[settingNames.keymaps];
+  const keymaps = app_settings.keymaps;
   const form = document.getElementById("edit-keymaps") as HTMLDivElement;
   form.replaceChildren();
 
@@ -145,7 +131,7 @@ async function renderEditSection() {
 
 function saveKeymaps() {
   const form = document.getElementById("edit-keymaps") as HTMLDivElement;
-  const keymaps = app_settings[settingNames.keymaps];
+  const keymaps = app_settings.keymaps;
   const settings = form.querySelectorAll(".keymap-entry");
   for (let i = 0; i < settings.length; i++) {
     const setting = settings[i] as HTMLDivElement;
@@ -162,7 +148,7 @@ function saveKeymaps() {
       entry.url = url.value;
     }
   }
-  app_settings[settingNames.keymaps] = keymaps;
+  app_settings.keymaps = keymaps;
   chrome.storage.sync.set(app_settings).then((_) => {
     console.log("saved keymaps");
   });
@@ -170,10 +156,11 @@ function saveKeymaps() {
 
 async function loadMappings() {
   console.log("loading settings...");
-  var settings = await chrome.storage.sync.get([settingNames.keymaps]);
+  var settings = await chrome.storage.sync.get([
+    nameof<AppSettings>("keymaps"),
+  ]);
   if (settings) {
-    app_settings[settingNames.keymaps] =
-      (settings[settingNames.keymaps] as MapEntry[]) ?? sortedDefaultKeymaps;
+    app_settings.keymaps = (settings.keymaps as MapEntry[]) ?? defaultKeymaps;
   }
 
   console.log("render mappings...");
@@ -182,12 +169,12 @@ async function loadMappings() {
 
 async function enableKeymaps() {
   console.log("enabling keymaps...");
-  document.body.addEventListener("keydown", keyDownBehavior);
+  document.body.addEventListener("keydown", navigateToTabKeyDownBehavior);
 }
 
 async function disableKeymaps(reason: string) {
   console.log(`disabling keymaps because ${reason}...`);
-  document.body.removeEventListener("keydown", keyDownBehavior);
+  document.body.removeEventListener("keydown", navigateToTabKeyDownBehavior);
 }
 
 async function loadExtension() {
@@ -201,7 +188,7 @@ async function loadExtension() {
 
   const resetBtn = document.getElementById("reset-btn")! as HTMLButtonElement;
   resetBtn.addEventListener("click", () => {
-    app_settings[settingNames.keymaps] = defaultKeymaps;
+    app_settings.keymaps = defaultKeymaps;
     renderMappings();
   });
 
