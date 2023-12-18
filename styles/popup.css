@@ -69,6 +69,7 @@ form {
 
 .keymap-entry > .name {
   flex: 1;
+  color: black;
 }
 
 .keymap-entry > .search-text {

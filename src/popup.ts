@@ -1,5 +1,4 @@
 import { MapEntry, defaultKeymaps } from "./mappings";
-
 const leftKeys = [
   "q",
   "w",
@@ -17,13 +16,15 @@ const leftKeys = [
   "v",
 ];
 const rightKeys = ["y", "u", "i", "o", "p", "h", "j", "k", "l", "b", "n", "m"];
-const keyOrderBasedOnKeyboardLayout = [...leftKeys, ...rightKeys];
-const sortedDefaultKeymaps: MapEntry[] = [];
-for (let i = 0; i < keyOrderBasedOnKeyboardLayout.length; i++) {
-  const keymap = defaultKeymaps.find(
-    (e) => e.key === keyOrderBasedOnKeyboardLayout[i]
-  );
-  sortedDefaultKeymaps.push(keymap!);
+const qwertyLayout = [...leftKeys, ...rightKeys];
+
+function sortBasedOnKeyboard(keymaps: MapEntry[], layout: string[]) {
+  const sortedKeymaps: MapEntry[] = [];
+  for (let i = 0; i < layout.length; i++) {
+    const keymap = keymaps.find((e) => e.key === layout[i]);
+    sortedKeymaps.push(keymap!);
+  }
+  return sortedKeymaps;
 }
 
 const settingNames = {
@@ -44,8 +45,23 @@ const keyDownBehavior = (event: KeyboardEvent) => {
 
       if (matchingTabs.length > 0) {
         const tab = matchingTabs[0];
-        chrome.windows.update(tab.windowId, { focused: true });
-        chrome.tabs.update(tab.id, { active: true });
+        console.log(`found tab ${tab.id} for key ${event.key}`);
+        chrome.tabs.update(tab.id, { active: true }, () => {
+          if (chrome.runtime.lastError) {
+            console.log(
+              `error activating tab reason : ${chrome.runtime.lastError.message}`
+            );
+            return;
+          }
+          chrome.windows.update(tab.windowId, { focused: true }, () => {
+            if (chrome.runtime.lastError) {
+              console.log(
+                `error activating window reason : ${chrome.runtime.lastError.message}`
+              );
+              return;
+            }
+          });
+        });
       } else {
         chrome.tabs.create({ url: entry.url });
       }
@@ -63,7 +79,8 @@ async function renderMappings() {
   const keymaps = app_settings[settingNames.keymaps];
   const list = document.getElementById("mapping-list") as HTMLUListElement;
   list.replaceChildren();
-  for (const entry of keymaps) {
+  var sortedKeymaps = sortBasedOnKeyboard(keymaps, qwertyLayout);
+  for (const entry of sortedKeymaps) {
     const item = document.createElement("div");
     item.className = "mapping-item";
 
@@ -179,6 +196,12 @@ async function loadExtension() {
   const saveBtn = document.getElementById("save-btn")! as HTMLButtonElement;
   saveBtn.addEventListener("click", () => {
     saveKeymaps();
+    renderMappings();
+  });
+
+  const resetBtn = document.getElementById("reset-btn")! as HTMLButtonElement;
+  resetBtn.addEventListener("click", () => {
+    app_settings[settingNames.keymaps] = defaultKeymaps;
     renderMappings();
   });
 
