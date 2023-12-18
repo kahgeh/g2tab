@@ -6,6 +6,17 @@ body {
   background-color: #050505;
 }
 
+.header-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header-section > button {
+  margin-left: auto;
+}
+
 h1 {
   font-size: 1.5em;
   font-weight: bold;
@@ -24,8 +35,8 @@ form {
 .mappings {
   width: 50em;
   display: flex;
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   padding: 20px;
   flex-direction: row;
   border-radius: 1em;
@@ -78,4 +89,21 @@ form {
 
 .keymap-entry > .url {
   flex: 3;
+}
+
+.settings-btn {
+  padding: 0;
+  display: flex;
+}
+
+.btn-icon {
+  color: white;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 5px;
 }

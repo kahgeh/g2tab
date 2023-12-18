@@ -16,8 +16,9 @@ const leftKeys = [
   "x",
   "c",
   "v",
+  "b",
 ];
-const rightKeys = ["y", "u", "i", "o", "p", "h", "j", "k", "l", "b", "n", "m"];
+const rightKeys = ["y", "u", "i", "o", "p", "h", "j", "k", "l", "n", "m"];
 const qwertyLayout = [...leftKeys, ...rightKeys];
 
 function sortBasedOnKeyboard(keymaps: MapEntry[], layout: string[]) {
@@ -186,11 +187,11 @@ async function loadExtension() {
     renderMappings();
   });
 
-  const resetBtn = document.getElementById("reset-btn")! as HTMLButtonElement;
-  resetBtn.addEventListener("click", () => {
-    app_settings.keymaps = defaultKeymaps;
-    renderMappings();
-  });
+  // const resetBtn = document.getElementById("reset-btn")! as HTMLButtonElement;
+  // resetBtn.addEventListener("click", () => {
+  //   app_settings.keymaps = defaultKeymaps;
+  //   renderMappings();
+  // });
 
   toggleEditBtn!.addEventListener("click", () => {
     if (toggleEditBtn!.value.indexOf("Edit") >= 0) {
