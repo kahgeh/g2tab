@@ -1,10 +1,17 @@
 import { MapEntry } from "./mappings";
 
-type RequestType = "LOG" | "NAVTO_PREV_TAB" | "SEARCH_TABS";
+type RequestType =
+  | "LOG"
+  | "GET_KEYMAPS"
+  | "SAVE_KEYMAPS"
+  | "NAVTO_PREV_TAB"
+  | "SEARCH_TABS";
 
 export const REQ_LOG = "LOG";
 export const REQ_PREVIOUS_TAB = "NAVTO_PREV_TAB";
 export const REQ_SEARCH_TABS = "SEARCH_TABS";
+export const REQ_GET_KEYMAPS = "GET_KEYMAPS";
+export const REQ_SAVE_KEYMAPS = "SAVE_KEYMAPS";
 
 export interface Request {
   type: RequestType;
@@ -18,4 +25,8 @@ export interface LogRequest extends Request {
 export interface SearchTabRequest extends Request {
   key: string;
   mappings: MapEntry[];
+}
+
+export interface SaveKeymapsRequest extends Request {
+  keymaps: MapEntry[];
 }

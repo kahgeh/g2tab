@@ -1,11 +1,38 @@
+import { MapEntry, defaultKeymaps } from "./mappings";
 import {
   LogRequest,
+  REQ_GET_KEYMAPS,
   REQ_LOG,
   REQ_PREVIOUS_TAB,
+  REQ_SAVE_KEYMAPS,
   REQ_SEARCH_TABS,
   Request,
+  SaveKeymapsRequest,
   SearchTabRequest,
 } from "./contracts";
+import { nameof } from "./utils";
+
+interface AppSettings {
+  keymaps: MapEntry[];
+}
+
+var app_settings: AppSettings = {
+  keymaps: [],
+};
+
+async function loadAppSettings() {
+  var settings = await chrome.storage.sync.get([
+    nameof<AppSettings>("keymaps"),
+  ]);
+  if (!settings) {
+    console.log("no settings found");
+    return;
+  }
+  app_settings.keymaps = (settings.keymaps as MapEntry[]) ?? defaultKeymaps;
+}
+chrome.runtime.onStartup.addListener(async () => {
+  await loadAppSettings();
+});
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.storage.local.get(["recordedTabs"], (result) => {
@@ -19,7 +46,7 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   });
 });
 
-chrome.runtime.onMessage.addListener((request) => {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   const { type, activeTab } = request as Request;
   if (type === REQ_LOG) {
     const { message } = request as LogRequest;
@@ -33,13 +60,17 @@ chrome.runtime.onMessage.addListener((request) => {
         console.log("no recorded tabs");
         return;
       }
-      const [first, second] = result.recordedTabs;
-      if (!second) {
+      const [oldTab, olderTab] = result.recordedTabs;
+      if (!olderTab) {
         console.log("no previous recorded tab");
         return;
       }
+
+      // note: when the active tab is switched to another window, it seems that the `chrome.tab.onActivated`
+      // event does not, either get triggered or there is some bug that prevents the right tab from being recorded.
+      // in these scenario, the last recorded tab is the effective previous tab
       const { tabId, windowId } =
-        first && first.tabId !== activeTab.id ? first : second;
+        oldTab && oldTab.tabId !== activeTab.id ? oldTab : olderTab;
       chrome.tabs.update(tabId, { active: true }, () => {
         if (chrome.runtime.lastError) {
           console.log(
@@ -58,10 +89,12 @@ chrome.runtime.onMessage.addListener((request) => {
       });
       return;
     });
+    return;
   }
 
   if (type === REQ_SEARCH_TABS) {
-    const { key, mappings } = request as SearchTabRequest;
+    const mappings = app_settings.keymaps;
+    const { key } = request as SearchTabRequest;
     const entry = mappings.find((e) => e.key === key);
 
     if (!entry) {
@@ -105,6 +138,43 @@ chrome.runtime.onMessage.addListener((request) => {
       }
     });
 
+    return;
+  }
+
+  if (type === REQ_GET_KEYMAPS) {
+    if (app_settings.keymaps.length > 0) {
+      console.log("using cached settings");
+      sendResponse({ ...app_settings });
+      return;
+    }
+
+    //todo: replace this with loadSettings
+    chrome.storage.sync.get([nameof<AppSettings>("keymaps")], (settings) => {
+      console.log("loading settings...");
+      if (!settings || !settings.keymaps || settings.keymaps.length === 0) {
+        app_settings.keymaps = defaultKeymaps;
+        sendResponse({ ...app_settings });
+        console.log("no settings found, using default");
+        return;
+      }
+
+      try {
+        sendResponse({ ...app_settings });
+        return;
+      } catch (e) {
+        console.error(e);
+      }
+    });
+    return true;
+  }
+
+  if (type === REQ_SAVE_KEYMAPS) {
+    const { keymaps } = request as SaveKeymapsRequest;
+    chrome.storage.sync.set({ keymaps }, () => {
+      console.log("saved keymaps");
+      app_settings.keymaps = keymaps;
+      sendResponse({ keymaps });
+    });
     return true;
   }
 });
