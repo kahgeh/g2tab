@@ -107,3 +107,13 @@ form {
   align-items: center;
   padding: 5px;
 }
+
+.instructions {
+  font-size: 1em;
+  font-style: italic;
+  color: #c3c3c3;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
