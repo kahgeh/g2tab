@@ -75,7 +75,7 @@ function renderMappings(keymaps: MapEntry[]) {
   return list;
 }
 
-async function renderEditSection(keymaps: MapEntry[]) {
+function renderEditSection(keymaps: MapEntry[]) {
   const form = document.getElementById("edit-keymaps") as HTMLDivElement;
   form.replaceChildren();
 
@@ -185,6 +185,60 @@ async function loadExtension() {
     switchKeymaps("g2tab");
   });
 
+  const downloadBtn = document.getElementById(
+    "download-btn"
+  )! as HTMLButtonElement;
+  downloadBtn.addEventListener("click", async () => {
+    const settings = await chrome.runtime.sendMessage({
+      type: REQ_GET_KEYMAPS,
+    });
+
+    if (chrome.runtime.lastError) {
+      console.error("Error retrieving settings:", chrome.runtime.lastError);
+      return;
+    }
+
+    const settingsStr = JSON.stringify(settings, null, 2);
+    const blob = new Blob([settingsStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "settings.json";
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  });
+
+  const loadSettingsBtn = document.getElementById(
+    "load-settings-btn"
+  )! as HTMLButtonElement;
+
+  loadSettingsBtn.addEventListener("click", () => {
+    const fileInput = document.getElementById(
+      "file-input"
+    )! as HTMLInputElement;
+    if (!fileInput.files || fileInput.files.length === 0) {
+      return;
+    }
+
+    const file = fileInput.files![0];
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      const settings = JSON.parse(e.target.result);
+      renderEditSection(settings.keymaps);
+    };
+
+    reader.onerror = function () {
+      console.error("Error reading file.");
+    };
+
+    reader.readAsText(file);
+  });
   settingsDiv.style.display = "none";
   initKeydownWithNavigateToTab();
 }

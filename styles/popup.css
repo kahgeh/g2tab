@@ -32,6 +32,10 @@ form {
   flex-direction: column;
 }
 
+.file-input {
+  color: #f2f2f2;
+}
+
 .mappings {
   width: 50em;
   display: flex;
@@ -91,12 +95,12 @@ form {
   flex: 3;
 }
 
-.settings-btn {
+.icon-btn {
   padding: 0;
   display: flex;
 }
 
-.btn-icon {
+.icon {
   color: white;
 }
 
@@ -116,4 +120,14 @@ form {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+}
+
+.action-panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 5px;
+  column-gap: 5px;
+  margin-left: auto;
 }
