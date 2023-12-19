@@ -1,43 +1,18 @@
+import { REQ_GET_KEYMAPS, REQ_SAVE_KEYMAPS } from "./contracts";
 import {
-  REQ_GET_KEYMAPS,
-  REQ_PREVIOUS_TAB,
-  REQ_SAVE_KEYMAPS,
-  REQ_SEARCH_TABS,
-} from "./contracts";
+  createSwitchKeymapsFn,
+  editSettingsKeyDownBehavior,
+  initKeydownWithNavigateToTab,
+  navigateToTabKeyDownBehavior,
+} from "./keydownBehaviours";
 import { MapEntry } from "./mappings";
+import { saveBtnId, toggleEditBtnId } from "./uiControlsIds";
 
-export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
-  console.log(`key down "${event.key}"`);
-  let queryOptions = { active: true, lastFocusedWindow: true };
-  // `tab` will either be a `tabs.Tab` instance or `undefined`.
-  chrome.tabs.query(queryOptions).then(([activeTab]) => {
-    if (event.key === " ") {
-      chrome.runtime.sendMessage({ type: REQ_PREVIOUS_TAB, activeTab });
-      return;
-    }
+const switchKeymaps = createSwitchKeymapsFn({
+  g2tab: navigateToTabKeyDownBehavior,
+  editSettings: editSettingsKeyDownBehavior,
+});
 
-    chrome.runtime.sendMessage({
-      type: REQ_SEARCH_TABS,
-      key: event.key,
-      activeTab,
-    });
-  });
-};
-
-// function createSwitchKeymapsFn(keymapLookup: {
-//   [key: string]: (event: KeyboardEvent) => void;
-// }) {
-//   let currentListener = keymapLookup["g2tab"] as (event: KeyboardEvent) => void;
-//   return (keymapName: string) => {
-//     document.body.removeEventListener("keydown", currentListener);
-//     currentListener = keymapLookup[keymapName];
-//     document.body.addEventListener("keydown", currentListener);
-//   };
-// }
-// const switchKeymaps = createSwitchKeymapsFn({
-//   g2tab: navigateToTabKeyDownBehavior,
-//   editSettings: editSettingsKeyDownBehavior,
-// });
 const leftKeys = [
   "q",
   "w",
@@ -73,17 +48,9 @@ function sortBasedOnKeyboard(keymaps: MapEntry[], layout: string[]) {
   return sortedKeymaps;
 }
 
-interface AppSettings {
-  keymaps: MapEntry[];
-}
-
-var app_settings: AppSettings = {
-  keymaps: [],
-};
-
 const settingsDiv = document.getElementById("settings") as HTMLDivElement;
 const toggleEditBtn = document.getElementById(
-  "toggle-edit-btn"
+  toggleEditBtnId
 ) as HTMLButtonElement;
 
 function renderMappings(keymaps: MapEntry[]) {
@@ -125,7 +92,7 @@ async function renderEditSection(keymaps: MapEntry[]) {
     name.type = "text";
     name.placeholder = "Name";
     name.className = "name";
-    name.id = "name";
+    name.id = `name-${entry.key}`;
     name.name = "name";
     name.value = entry.name;
     setting.appendChild(name);
@@ -134,7 +101,7 @@ async function renderEditSection(keymaps: MapEntry[]) {
     searchText.className = "search-text";
     searchText.placeholder = "Search text";
     searchText.type = "text";
-    searchText.id = "searchText";
+    searchText.id = `searchText-${entry.key}`;
     searchText.name = "searchText";
     searchText.value = entry.searchText;
     setting.appendChild(searchText);
@@ -143,7 +110,7 @@ async function renderEditSection(keymaps: MapEntry[]) {
     url.className = "url";
     url.placeholder = "URL";
     url.type = "text";
-    url.id = "url";
+    url.id = `url-${entry.key}`;
     url.name = "url";
     url.value = entry.url;
     setting.appendChild(url);
@@ -182,21 +149,11 @@ async function loadMappings() {
   renderMappings(settings.keymaps);
 }
 
-function enableKeymaps() {
-  console.log("enabling keymaps...");
-  document.body.addEventListener("keydown", navigateToTabKeyDownBehavior);
-}
-
-function disableKeymaps(reason: string) {
-  console.log(`disabling keymaps because ${reason}...`);
-  document.body.removeEventListener("keydown", navigateToTabKeyDownBehavior);
-}
-
 async function loadExtension() {
   console.log("loading extension popup...");
   await loadMappings();
 
-  const saveBtn = document.getElementById("save-btn")! as HTMLButtonElement;
+  const saveBtn = document.getElementById(saveBtnId)! as HTMLButtonElement;
   saveBtn.addEventListener("click", async () => {
     const settings = await chrome.runtime.sendMessage({
       type: REQ_GET_KEYMAPS,
@@ -220,17 +177,16 @@ async function loadExtension() {
       renderEditSection(settings.keymaps);
       toggleEditBtn!.value = "Hide";
       settingsDiv.style.display = "flex";
-      disableKeymaps("editing keymaps");
+      switchKeymaps("editSettings");
       return;
     }
     toggleEditBtn!.value = "Edit keymaps";
     settingsDiv.style.display = "none";
-    enableKeymaps();
+    switchKeymaps("g2tab");
   });
 
   settingsDiv.style.display = "none";
-
-  enableKeymaps();
+  initKeydownWithNavigateToTab();
 }
 
 await loadExtension();

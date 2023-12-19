@@ -145,7 +145,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     if (app_settings.keymaps.length > 0) {
       console.log("using cached settings");
       sendResponse({ ...app_settings });
-      return;
+      return true;
     }
 
     //todo: replace this with loadSettings
@@ -155,12 +155,13 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
         app_settings.keymaps = defaultKeymaps;
         sendResponse({ ...app_settings });
         console.log("no settings found, using default");
-        return;
+        return true;
       }
 
+      app_settings.keymaps = settings.keymaps;
       try {
         sendResponse({ ...app_settings });
-        return;
+        return true;
       } catch (e) {
         console.error(e);
       }
