@@ -6,7 +6,7 @@ body {
   background-color: #050505;
 }
 
-.header-section {
+.panel {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -104,14 +104,6 @@ form {
   color: white;
 }
 
-.control-panel {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 5px;
-}
-
 .instructions {
   font-size: 1em;
   font-style: italic;
@@ -119,7 +111,6 @@ form {
   padding: 5px;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
 }
 
 .action-panel {
@@ -129,5 +120,13 @@ form {
   align-items: center;
   padding: 5px;
   column-gap: 5px;
+  margin-left: auto;
+}
+
+.padding-lefright-small-topbottom-large {
+  padding: 10px 5px 10px 5px;
+}
+.align-right {
+  display: flex;
   margin-left: auto;
 }

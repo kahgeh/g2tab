@@ -1,5 +1,11 @@
 import { REQ_PREVIOUS_TAB, REQ_SEARCH_TABS } from "./contracts";
-import { saveBtnId, toggleEditBtnId } from "./uiControlsIds";
+import {
+  downloadBtnId,
+  fileInputId,
+  loadSettingsBtnId,
+  saveBtnId,
+  toggleEditBtnId,
+} from "./uiControlsIds";
 import { nameof } from "./utils";
 
 export interface KeymapLookup {
@@ -64,6 +70,15 @@ export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
     return;
   }
 
+  if (key === "D") {
+    event.preventDefault();
+    const downloadBtn = document.getElementById(
+      downloadBtnId
+    ) as HTMLButtonElement;
+    downloadBtn.click();
+    return;
+  }
+
   let queryOptions = { active: true, lastFocusedWindow: true };
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
   chrome.tabs.query(queryOptions).then(([activeTab]) => {
@@ -107,6 +122,24 @@ export const editSettingsKeyDownBehavior = (event: KeyboardEvent) => {
     event.preventDefault();
     const saveBtn = document.getElementById(saveBtnId)! as HTMLButtonElement;
     saveBtn.click();
+    return;
+  }
+
+  if (key === "F") {
+    event.preventDefault();
+    const fileInput = document.getElementById(
+      fileInputId
+    )! as HTMLButtonElement;
+    fileInput.click();
+    return;
+  }
+
+  if (key === "L") {
+    event.preventDefault();
+    const loadSettingsBtn = document.getElementById(
+      loadSettingsBtnId
+    )! as HTMLButtonElement;
+    loadSettingsBtn.click();
     return;
   }
 

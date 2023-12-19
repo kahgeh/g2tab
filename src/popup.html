@@ -8,7 +8,7 @@
   </head>
 
   <body>
-    <div class="header-section">
+    <div class="panel">
       <h1>G/open tabs</h1>
       <div class="action-panel">
         <button id="download-btn" value="Download" class="icon-btn">
@@ -42,16 +42,23 @@
     <div id="mapping-list" class="mappings"></div>
     <script src="popup.ts" type="module"></script>
     <p class="instructions">
-      editing : "E" - toggle edit keymaps, "S" - save keymaps(edit keymaps
-      mode), alphabet(i.e. "a" or "b" or ...) - focus on the specific key map
-      entry
+      "E" - toggle edit keymaps and in edit mode, "S" - save keymaps, "F" -
+      Choose settings file to load, "L" - Load chosen json settings file,
+      alphabet(i.e. "a" or "b" or ...) - focus on the specific key map entry
     </p>
     <div id="settings" class="settings">
       <hr />
-      <div class="control-panel">
-        <input id="file-input" type="file" accept=".json" class="file-input" />
-        <input id="load-settings-btn" type="button" value="Load Settings" />
-        <input id="save-btn" type="button" value="Save" />
+      <div class="panel padding-lefright-small-topbottom-large">
+        <div class="panel">
+          <input
+            id="file-input"
+            type="file"
+            accept=".json"
+            class="file-input"
+          />
+          <input id="load-settings-btn" type="button" value="Load Settings" />
+        </div>
+        <input id="save-btn" type="button" value="Save" class="align-right" />
       </div>
       <form id="edit-keymaps"></form>
     </div>

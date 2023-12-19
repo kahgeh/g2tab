@@ -6,7 +6,13 @@ import {
   navigateToTabKeyDownBehavior,
 } from "./keydownBehaviours";
 import { MapEntry } from "./mappings";
-import { saveBtnId, toggleEditBtnId } from "./uiControlsIds";
+import {
+  downloadBtnId,
+  fileInputId,
+  loadSettingsBtnId,
+  saveBtnId,
+  toggleEditBtnId,
+} from "./uiControlsIds";
 
 const switchKeymaps = createSwitchKeymapsFn({
   g2tab: navigateToTabKeyDownBehavior,
@@ -186,7 +192,7 @@ async function loadExtension() {
   });
 
   const downloadBtn = document.getElementById(
-    "download-btn"
+    downloadBtnId
   )! as HTMLButtonElement;
   downloadBtn.addEventListener("click", async () => {
     const settings = await chrome.runtime.sendMessage({
@@ -213,13 +219,11 @@ async function loadExtension() {
   });
 
   const loadSettingsBtn = document.getElementById(
-    "load-settings-btn"
+    loadSettingsBtnId
   )! as HTMLButtonElement;
 
   loadSettingsBtn.addEventListener("click", () => {
-    const fileInput = document.getElementById(
-      "file-input"
-    )! as HTMLInputElement;
+    const fileInput = document.getElementById(fileInputId)! as HTMLInputElement;
     if (!fileInput.files || fileInput.files.length === 0) {
       return;
     }
