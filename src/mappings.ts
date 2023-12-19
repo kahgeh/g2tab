@@ -1,4 +1,4 @@
-import emptyMappings from "../config/empty-mappings.json";
+import emptyMappings from "./config/empty-mappings.json";
 
 export interface MapEntry {
   name: string;

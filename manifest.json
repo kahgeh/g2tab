@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "go2tab",
   "version": "1.0",
-  "description": "Manage tabs and get to them quickly",
+  "description": "Navigate to known web sites quickly using muscle memory",
   "permissions": ["tabs", "windows", "storage"],
   "action": {
     "default_popup": "src/popup.html",
@@ -19,11 +19,5 @@
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["config/mappings.json"],
-      "matches": ["https://*/*", "http://*/*"]
-    }
-  ]
+  }
 }
