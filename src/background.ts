@@ -153,7 +153,8 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
       return;
     }
 
-    const query = entry.searchText.toLowerCase();
+    const searchText = entry.searchText.toLowerCase();
+    const otherEntries = mappings.filter((e) => e.key !== key);
     chrome.windows.getAll({ populate: true }, (windows) => {
       const matchingTabs: chrome.tabs.Tab[] = [];
 
@@ -162,17 +163,27 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
           continue;
         }
         for (const tab of window.tabs) {
-          if (tab.url && tab.url.toLowerCase().includes(query)) {
+          if (tab.url && tab.url.toLowerCase().includes(searchText)) {
             matchingTabs.push(tab);
           }
         }
       }
+
       if (matchingTabs.length > 0) {
-        const tab = matchingTabs[0];
-        activateTab(tab.id!, tab.windowId);
-      } else {
-        chrome.tabs.create({ url: entry.url });
+        // exclude tabs where the url matches exactly to the url of other entries
+        const tabsMatchingSearchTextButNotOtherEntriesExactUrl =
+          matchingTabs.filter(
+            (t) => !otherEntries.some((e) => e.url === t.url)
+          );
+
+        // activate the first tab that matches the search text but not the url of other entries
+        if (tabsMatchingSearchTextButNotOtherEntriesExactUrl.length > 0) {
+          const tab = tabsMatchingSearchTextButNotOtherEntriesExactUrl[0];
+          activateTab(tab.id!, tab.windowId);
+          return;
+        }
       }
+      chrome.tabs.create({ url: entry.url });
     });
 
     return;
