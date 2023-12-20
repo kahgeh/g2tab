@@ -92,6 +92,12 @@ export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
       key,
       activeTab,
     });
+
+    // note: ideally we would like to close the popup (window.close()) after the user has pressed a key,
+    // however, when the focus has been shifted to a tab in another window, closing the popup will refocus
+    // the active window to the window where the popup was opened from. This is not the desired behavior.
+    // To work around this, we just hide the popup instead.
+    document.body.innerHTML = "";
   });
 };
 
