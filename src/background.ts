@@ -9,15 +9,22 @@ import {
   Request,
   SaveKeymapsRequest,
   SearchTabRequest,
+  REQ_MARK_AS_SCRATCH,
+  REQ_NAV_TO_SCRATCH,
 } from "./contracts";
 import { nameof } from "./utils";
 
+type TabInfo = { id: number; windowId: number };
 interface AppSettings {
   keymaps: MapEntry[];
+  currentTab: TabInfo | null;
+  scratchTab: TabInfo | null;
 }
 
 var app_settings: AppSettings = {
   keymaps: [],
+  currentTab: null,
+  scratchTab: null,
 };
 
 async function loadAppSettings() {
@@ -30,11 +37,35 @@ async function loadAppSettings() {
   }
   app_settings.keymaps = (settings.keymaps as MapEntry[]) ?? defaultKeymaps;
 }
+
+function activateTab(id: number, windowId: number) {
+  chrome.tabs.update(id, { active: true }, () => {
+    if (chrome.runtime.lastError) {
+      console.log(
+        `error activating tab reason : ${chrome.runtime.lastError.message}`
+      );
+      return;
+    }
+    chrome.windows.update(windowId, { focused: true }, () => {
+      if (chrome.runtime.lastError) {
+        console.log(
+          `error activating window reason : ${chrome.runtime.lastError.message}`
+        );
+        return;
+      }
+    });
+  });
+}
+
 chrome.runtime.onStartup.addListener(async () => {
   await loadAppSettings();
 });
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
+  app_settings.currentTab = {
+    id: activeInfo.tabId,
+    windowId: activeInfo.windowId,
+  };
   chrome.storage.local.get(["recordedTabs"], (result) => {
     const newRecordedTabs =
       !result || !result.recordedTabs
@@ -92,6 +123,27 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     return;
   }
 
+  if (type === REQ_MARK_AS_SCRATCH) {
+    app_settings.scratchTab = { ...app_settings.currentTab! };
+    return;
+  }
+
+  if (type === REQ_NAV_TO_SCRATCH) {
+    const { scratchTab } = app_settings;
+    if (!scratchTab) {
+      console.log("no scratch tab");
+      return;
+    }
+
+    const { id, windowId } = scratchTab;
+    chrome.tabs.query({ windowId }, (tabs) => {
+      if (tabs.find((t) => t.id === scratchTab.id)) {
+        activateTab(id!, windowId);
+        return;
+      }
+    });
+  }
+
   if (type === REQ_NAV_OR_OPEN_TAB) {
     const mappings = app_settings.keymaps;
     const { key } = request as SearchTabRequest;
@@ -117,22 +169,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
       }
       if (matchingTabs.length > 0) {
         const tab = matchingTabs[0];
-        chrome.tabs.update(tab.id!, { active: true }, () => {
-          if (chrome.runtime.lastError) {
-            console.log(
-              `error activating tab reason : ${chrome.runtime.lastError.message}`
-            );
-            return;
-          }
-          chrome.windows.update(tab.windowId, { focused: true }, () => {
-            if (chrome.runtime.lastError) {
-              console.log(
-                `error activating window reason : ${chrome.runtime.lastError.message}`
-              );
-              return;
-            }
-          });
-        });
+        activateTab(tab.id!, tab.windowId);
       } else {
         chrome.tabs.create({ url: entry.url });
       }

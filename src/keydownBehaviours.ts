@@ -1,4 +1,9 @@
-import { REQ_PREVIOUS_TAB, REQ_NAV_OR_OPEN_TAB } from "./contracts";
+import {
+  REQ_PREVIOUS_TAB,
+  REQ_NAV_OR_OPEN_TAB,
+  REQ_MARK_AS_SCRATCH,
+  REQ_NAV_TO_SCRATCH,
+} from "./contracts";
 import {
   downloadBtnId,
   fileInputId,
@@ -59,6 +64,15 @@ const alphabets = [
   "z",
 ];
 
+function closeWindow() {
+  // note: ideally we would like to close the popup (window.close()) after the user has pressed a key,
+  // however, when the focus has been shifted to a tab in another window, closing the popup will refocus
+  // the active window to the window where the popup was opened from. This is not the desired behavior.
+  // To work around this, we just hide the popup instead.
+  document.body.innerHTML = "";
+  document.body.style.opacity = "0";
+}
+
 export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
   const { key } = event;
   if (key === "E") {
@@ -79,25 +93,38 @@ export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
     return;
   }
 
+  if (key === "M") {
+    chrome.runtime.sendMessage({
+      type: REQ_MARK_AS_SCRATCH,
+    });
+    return;
+  }
+
+  if (key === ",") {
+    closeWindow();
+    chrome.runtime.sendMessage({
+      type: REQ_NAV_TO_SCRATCH,
+    });
+    return;
+  }
+
   let queryOptions = { active: true, lastFocusedWindow: true };
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
   chrome.tabs.query(queryOptions).then(([activeTab]) => {
-    if (event.key === " ") {
+    if (key === " ") {
+      closeWindow();
       chrome.runtime.sendMessage({ type: REQ_PREVIOUS_TAB, activeTab });
       return;
     }
 
-    chrome.runtime.sendMessage({
-      type: REQ_NAV_OR_OPEN_TAB,
-      key,
-      activeTab,
-    });
-
-    // note: ideally we would like to close the popup (window.close()) after the user has pressed a key,
-    // however, when the focus has been shifted to a tab in another window, closing the popup will refocus
-    // the active window to the window where the popup was opened from. This is not the desired behavior.
-    // To work around this, we just hide the popup instead.
-    document.body.innerHTML = "";
+    if (alphabets.includes(key)) {
+      closeWindow();
+      chrome.runtime.sendMessage({
+        type: REQ_NAV_OR_OPEN_TAB,
+        key,
+        activeTab,
+      });
+    }
   });
 };
 
