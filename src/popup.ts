@@ -152,7 +152,10 @@ async function loadMappings() {
   console.log("loading settings...");
   const settings = await chrome.runtime.sendMessage({ type: REQ_GET_KEYMAPS });
   console.log("render mappings...");
-  renderMappings(settings.keymaps);
+  renderMappings([
+    ...settings.keymaps,
+    { key: ",", name: "scratch", searchText: "na", url: "na" },
+  ]);
 }
 
 async function loadExtension() {
