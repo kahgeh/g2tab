@@ -5,11 +5,11 @@ type RequestType =
   | "GET_KEYMAPS"
   | "SAVE_KEYMAPS"
   | "NAVTO_PREV_TAB"
-  | "SEARCH_TABS";
+  | "NAV_OR_OPEN_TAB";
 
 export const REQ_LOG = "LOG";
 export const REQ_PREVIOUS_TAB = "NAVTO_PREV_TAB";
-export const REQ_SEARCH_TABS = "SEARCH_TABS";
+export const REQ_NAV_OR_OPEN_TAB = "NAV_OR_OPEN_TAB";
 export const REQ_GET_KEYMAPS = "GET_KEYMAPS";
 export const REQ_SAVE_KEYMAPS = "SAVE_KEYMAPS";
 

@@ -1,4 +1,4 @@
-import { REQ_PREVIOUS_TAB, REQ_SEARCH_TABS } from "./contracts";
+import { REQ_PREVIOUS_TAB, REQ_NAV_OR_OPEN_TAB } from "./contracts";
 import {
   downloadBtnId,
   fileInputId,
@@ -88,7 +88,7 @@ export const navigateToTabKeyDownBehavior = (event: KeyboardEvent) => {
     }
 
     chrome.runtime.sendMessage({
-      type: REQ_SEARCH_TABS,
+      type: REQ_NAV_OR_OPEN_TAB,
       key,
       activeTab,
     });

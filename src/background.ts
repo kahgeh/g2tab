@@ -5,7 +5,7 @@ import {
   REQ_LOG,
   REQ_PREVIOUS_TAB,
   REQ_SAVE_KEYMAPS,
-  REQ_SEARCH_TABS,
+  REQ_NAV_OR_OPEN_TAB,
   Request,
   SaveKeymapsRequest,
   SearchTabRequest,
@@ -92,7 +92,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     return;
   }
 
-  if (type === REQ_SEARCH_TABS) {
+  if (type === REQ_NAV_OR_OPEN_TAB) {
     const mappings = app_settings.keymaps;
     const { key } = request as SearchTabRequest;
     const entry = mappings.find((e) => e.key === key);
