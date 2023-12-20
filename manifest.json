@@ -3,7 +3,7 @@
   "name": "go2tab",
   "version": "1.0",
   "description": "Navigate to known web sites quickly using muscle memory",
-  "permissions": ["tabs", "windows", "storage"],
+  "permissions": ["tabs", "storage"],
   "action": {
     "default_popup": "src/popup.html",
     "default_icon": {
