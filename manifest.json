@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "go2tab",
-  "version": "1.0",
+  "version": "1.2",
   "description": "Navigate to known web sites quickly using muscle memory",
   "permissions": ["tabs", "storage"],
   "action": {

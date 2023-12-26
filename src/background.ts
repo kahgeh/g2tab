@@ -18,24 +18,31 @@ type TabInfo = { id: number; windowId: number };
 interface AppSettings {
   keymaps: MapEntry[];
   currentTab: TabInfo | null;
-  scratchTab: TabInfo | null;
+  scratchWindowId: number | null;
 }
 
 var app_settings: AppSettings = {
   keymaps: [],
   currentTab: null,
-  scratchTab: null,
+  scratchWindowId: null,
 };
 
 async function loadAppSettings() {
   var settings = await chrome.storage.sync.get([
     nameof<AppSettings>("keymaps"),
+    nameof<AppSettings>("scratchWindowId"),
   ]);
   if (!settings) {
     console.log("no settings found");
     return;
   }
-  app_settings.keymaps = (settings.keymaps as MapEntry[]) ?? defaultKeymaps;
+  const { scratchWindowId, keymaps } = settings;
+  if (scratchWindowId) {
+    chrome.windows.get(scratchWindowId, (_) => {
+      app_settings.scratchWindowId = scratchWindowId;
+    });
+  }
+  app_settings.keymaps = (keymaps as MapEntry[]) ?? defaultKeymaps;
 }
 
 function activateTab(id: number, windowId: number) {
@@ -124,23 +131,33 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   }
 
   if (type === REQ_MARK_AS_SCRATCH) {
-    app_settings.scratchTab = { ...app_settings.currentTab! };
+    chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+      if (!tabs || tabs.length === 0) {
+        console.log("no active tab");
+        return;
+      }
+      const currentTab = tabs[0];
+      console.log(
+        `marking window with current tab (${currentTab.id}) ${currentTab.title} as scratch`
+      );
+      app_settings.scratchWindowId = currentTab.windowId;
+      chrome.storage.sync.set(app_settings);
+    });
     return;
   }
 
   if (type === REQ_NAV_TO_SCRATCH) {
-    const { scratchTab } = app_settings;
-    if (!scratchTab) {
-      console.log("no scratch tab");
+    const { scratchWindowId } = app_settings;
+    if (!scratchWindowId) {
+      console.log("no scratch window");
       return;
     }
 
-    const { id, windowId } = scratchTab;
-    chrome.tabs.query({ windowId }, (tabs) => {
-      if (tabs.find((t) => t.id === scratchTab.id)) {
-        activateTab(id!, windowId);
-        return;
-      }
+    chrome.tabs.query({ windowId: scratchWindowId! }, (tabs) => {
+      console.log("a tab in scratch window found, navigating to it");
+      const tab = tabs[0];
+      activateTab(tab.id!, tab.windowId);
+      return;
     });
   }
 
